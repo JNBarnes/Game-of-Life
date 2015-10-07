@@ -11,6 +11,7 @@ var intGridSize; //height of grid in cells (square)
 var intSpacing = 1; //Spacing between cells in pixels
 var intCellSize = 5; //width of cell in pixels (square)
 var intStepDuration = 50;
+var blnPause = false;
 
 
 function init() {
@@ -152,12 +153,16 @@ function step(intCount){
     arrState = arrNewState;
     renderState();
 
-    if(intCount > 1){
-        setTimeout(function(){
-            step(intCount -1);
-        }, intStepDuration);
+    if(blnPause){
+        //save current step count
+        $("#btnPause").data("step-count", intCount - 1);
+    }else{
+        if(intCount > 1){
+            setTimeout(function(){
+                step(intCount -1);
+            }, intStepDuration);
+        }
     }
-
 }
 
 
@@ -190,4 +195,19 @@ function addGlider(){
 function randomise(){
     arrState = getRandomPopulatedArray(intGridSize, intGridSize);
     renderState();
+}
+
+/**
+ * Toggles pause state of rendering loop.
+ */
+function togglePause(){
+    var jqButton = $("#btnPause");
+    if(blnPause){
+        blnPause = !blnPause;
+        jqButton.text("Pause");
+        step(jqButton.data("step-count"));
+    }else{
+        blnPause = !blnPause;
+        jqButton.text("Un-Pause");
+    }
 }
