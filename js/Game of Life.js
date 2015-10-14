@@ -7,7 +7,8 @@
 
 var objContext; //Canvas 2d Context
 var arrState = []; //Current state of play (2d boolean array)
-var intGridSize; //height of grid in cells (square)
+var intGridSizeHeight; //height of grid in cells
+var intGridSizeWidth; //width of grid in cells
 var intSpacing = 1; //Spacing between cells in pixels
 var intCellSize = 5; //width of cell in pixels (square)
 var intStepDuration = 50;
@@ -15,10 +16,9 @@ var blnPause = false;
 
 
 function init() {
-    objContext = $("#grid")[0].getContext("2d");
-    intGridSize = Math.round(objContext.canvas.height / (intCellSize + intSpacing));
-    arrState = getPopulatedArray(intGridSize, intGridSize);
+    setGridSize();
     setupClickHandler();
+    setupResizeHandler();
 }
 
 function setupClickHandler(){
@@ -30,6 +30,12 @@ function setupClickHandler(){
     });
 }
 
+function setupResizeHandler(){
+    $(window).resize(function(){
+        setGridSize();
+    });
+}
+
 
 /**
  * Draws a square on grid at position
@@ -38,7 +44,7 @@ function setupClickHandler(){
  */
 function drawSquare(x, y) {
     objContext.fillStyle = "black";
-    objContext.fillRect((x*intSpacing) + ((x * intCellSize)), (y*intSpacing) + (y * intCellSize), intCellSize, intCellSize);
+    objContext.fillRect((y*intSpacing) + ((y * intCellSize)), (x*intSpacing) + (x * intCellSize), intCellSize, intCellSize);
 }
 
 /**
@@ -113,10 +119,10 @@ function getRandomPopulatedArray(intX, intY){
  */
 function getCell(x, y){
     //wrap coords
-    x = (x < 0 ? (intGridSize) + x : x);
-    x = (x > (intGridSize - 1) ? x - (intGridSize) : x);
-    y = (y < 0 ? (intGridSize) + y : y);
-    y = (y > (intGridSize - 1) ? y - (intGridSize) : y);
+    x = (x < 0 ? (intGridSizeHeight) + x : x);
+    x = (x > (intGridSizeHeight - 1) ? x - (intGridSizeHeight) : x);
+    y = (y < 0 ? (intGridSizeWidth) + y : y);
+    y = (y > (intGridSizeWidth - 1) ? y - (intGridSizeWidth) : y);
 
     return arrState[x][y];
 }
@@ -155,7 +161,7 @@ function step(intCount){
 
     if(blnPause){
         //save current step count
-        $("#btnPause").data("step-count", intCount - 1);
+        $("#pause-button").data("step-count", intCount - 1);
     }else{
         if(intCount > 1){
             setTimeout(function(){
@@ -172,7 +178,8 @@ function step(intCount){
  * @param y
  */
 function toggleCell(x, y){
-    arrState[x][y] = !arrState[x][y];
+    //Components reversed because of render origin rotation
+    arrState[y][x] = !arrState[y][x];
 }
 
 /**
@@ -193,7 +200,7 @@ function addGlider(){
 }
 
 function randomise(){
-    arrState = getRandomPopulatedArray(intGridSize, intGridSize);
+    arrState = getRandomPopulatedArray(intGridSizeHeight, intGridSizeWidth);
     renderState();
 }
 
@@ -201,7 +208,7 @@ function randomise(){
  * Toggles pause state of rendering loop.
  */
 function togglePause(){
-    var jqButton = $("#btnPause");
+    var jqButton = $("#pause-button");
     if(blnPause){
         blnPause = !blnPause;
         jqButton.text("Pause");
@@ -210,4 +217,19 @@ function togglePause(){
         blnPause = !blnPause;
         jqButton.text("Un-Pause");
     }
+}
+
+function setGridSize(){
+    var jqGrid = $("#grid");
+    var jqDocument = $(document);
+    jqGrid.attr("width",scaleInteger(jqDocument.width(), 0.9));
+    jqGrid.attr("height",scaleInteger(jqDocument.height(), 0.9));
+    objContext = $("#grid")[0].getContext("2d");
+    intGridSizeHeight = Math.round(objContext.canvas.height / (intCellSize + intSpacing));
+    intGridSizeWidth = Math.round(objContext.canvas.width / (intCellSize + intSpacing));
+    arrState = getPopulatedArray(intGridSizeHeight, intGridSizeWidth);
+}
+
+function scaleInteger(numValue, numScaleFactor){
+    return parseInt(numValue * numScaleFactor);
 }

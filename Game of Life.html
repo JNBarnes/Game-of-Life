@@ -3,10 +3,15 @@
 <html lang="en">
 <head>
     <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <link rel="stylesheet" href="Game%20of%20Life.css">
     <title>Canvas</title>
 
     <script src="https://code.jquery.com/jquery-2.1.4.min.js" type="application/javascript"></script>
-    <script src="Game%20of%20Life.js" type="application/javascript"></script>
+    <link href="js/jquery-ui-1.11.4/jquery-ui.css" rel="stylesheet">
+    <script src="js/jquery-ui-1.11.4/jquery-ui.js"></script>
+
+    <script src="js/Game%20of%20Life.js" type="application/javascript"></script>
+
     <script type="application/javascript">
         $(document).ready(function () {
             init();
@@ -17,11 +22,22 @@
 
 </head>
 <body>
-
-<canvas id="grid" width="800px" height="700px"></canvas>
+<div id="control-wrapper">
+    <div id="control-container">
+        <div class="control-row">
+            <span class="control-label"></span>
+            <div class="control-item"></div>
+        </div>
+        <div class="control-row">
+            <span class="control-label"></span>
+            <div class="control-item"></div>
+        </div>
+    </div>
+</div>
+<canvas id="grid"></canvas>
 <button onclick="step(10000)">Step</button>
 <button onclick="randomise()">Randomise</button>
-<button id="btnPause" onclick="togglePause();">Pause</button>
+<button id="pause-button" onclick="togglePause();">Pause</button>
 
 </body>
 </html>
